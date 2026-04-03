@@ -1,147 +1,174 @@
-# Bash to Zsh Migration Guide (WSL)
+# Bash to Zsh Migration Guide (WSL Ubuntu/Debian)
 
-Idempotent migration instructions — each step checks before acting.
+This version reflects the current shell setup:
 
-## 1. Install Zsh
+- `zsh` is the default shell
+- Oh My Zsh is installed under `~/.oh-my-zsh`
+- the active theme is `agnoster`
+- the active plugin set is `git zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete fnm`
+- `fnm` is used instead of `nvm`
+- `~/.local/bin` is kept on `PATH`
+
+The commands below are written to be safe to re-run.
+
+## 1. Install base packages
 
 ```bash
-if ! command -v zsh &>/dev/null; then
-  sudo apt update && sudo apt install -y zsh
-else
-  echo "zsh already installed: $(zsh --version)"
-fi
+sudo apt update
+sudo apt install -y zsh git curl unzip
 ```
 
-## 2. Set Zsh as Default Shell
+## 2. Set Zsh as the default shell
 
 ```bash
 if [ "$(basename "$SHELL")" != "zsh" ]; then
-  chsh -s "$(which zsh)"
-  echo "Default shell changed to zsh. Log out and back in to take effect."
+  chsh -s "$(command -v zsh)"
+  echo "Default shell changed to zsh. Sign out and back in if the current session stays on bash."
 else
   echo "zsh is already the default shell"
 fi
 ```
 
-## 3. Install Oh My Zsh
+## 3. Install Oh My Zsh without replacing an existing `.zshrc`
 
 ```bash
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
+    "" --unattended
 else
   echo "Oh My Zsh already installed"
 fi
 ```
 
-## 4. Set Theme (Optional — Agnoster)
+## 4. Set the theme to `agnoster`
 
 ```bash
-if ! grep -q '^ZSH_THEME="agnoster"' ~/.zshrc; then
+if grep -q '^ZSH_THEME=' ~/.zshrc; then
   sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' ~/.zshrc
-  echo "Theme set to agnoster"
 else
-  echo "Theme already set to agnoster"
+  printf '\nZSH_THEME="agnoster"\n' >> ~/.zshrc
 fi
 ```
 
-> Agnoster requires a Powerline-patched font in your terminal emulator.
+> `agnoster` looks best with a Nerd Font or another font that includes Powerline glyphs.
 
-## 5. Migrate Key Config from .bashrc
-
-Transfer NVM, custom PATH entries, and other environment setup from `~/.bashrc` to `~/.zshrc`.
-
-### NVM
-
-```bash
-if ! grep -q 'NVM_DIR' ~/.zshrc; then
-  cat >> ~/.zshrc << 'EOF'
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-EOF
-  echo "NVM config added to .zshrc"
-else
-  echo "NVM config already present in .zshrc"
-fi
-```
-
-### Custom PATH entries
-
-```bash
-# Review what .bashrc adds to PATH and replicate as needed:
-grep 'PATH=' ~/.bashrc
-# Then add any missing entries to ~/.zshrc
-```
-
-### Aliases and functions
-
-```bash
-# Check for custom aliases/functions in .bashrc and copy relevant ones:
-grep -n 'alias\|function ' ~/.bashrc
-```
-
-## 6. Install Plugins
-
-### zsh-autosuggestions (fish-like history suggestions)
+## 5. Install the current plugin set
 
 ```bash
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+mkdir -p "$ZSH_CUSTOM/plugins"
+
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
   git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-else
-  echo "zsh-autosuggestions already installed"
 fi
-```
 
-### zsh-syntax-highlighting (command validation coloring)
-
-```bash
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
   git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-else
-  echo "zsh-syntax-highlighting already installed"
 fi
-```
 
-### zsh-autocomplete (real-time tab-completion menu)
-
-```bash
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autocomplete" ]; then
-  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git "$ZSH_CUSTOM/plugins/zsh-autocomplete"
-else
-  echo "zsh-autocomplete already installed"
+  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git \
+    "$ZSH_CUSTOM/plugins/zsh-autocomplete"
 fi
 ```
 
-### Enable plugins in .zshrc
+## 6. Make `.zshrc` match the current setup
 
-```bash
-if ! grep -q 'zsh-autosuggestions' ~/.zshrc; then
-  sed -i 's/^plugins=(\(.*\))/plugins=(\1 zsh-autosuggestions zsh-syntax-highlighting zsh-autocomplete)/' ~/.zshrc
-  echo "Plugins added to .zshrc"
-else
-  echo "Plugins already configured"
+### Plugin list
+
+Make sure the `plugins=(...)` block in `~/.zshrc` contains these entries once:
+
+```zsh
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  zsh-autocomplete
+  fnm
+)
+```
+
+If you already use additional Oh My Zsh plugins, keep them and only add the missing entries above. For an idempotent setup, avoid blindly replacing the whole block unless you explicitly want to standardize on this exact list.
+
+### Make `fnm` available before Oh My Zsh loads plugins
+
+Ensure this block exists above `source $ZSH/oh-my-zsh.sh`:
+
+```zsh
+# Make fnm available before Oh My Zsh loads plugins.
+if [ -d "$HOME/.fnm" ]; then
+  export PATH="$HOME/.fnm:$PATH"
+elif [ -n "$XDG_DATA_HOME" ] && [ -d "$XDG_DATA_HOME/fnm" ]; then
+  export PATH="$XDG_DATA_HOME/fnm:$PATH"
+elif [ -d "$HOME/.local/share/fnm" ]; then
+  export PATH="$HOME/.local/share/fnm:$PATH"
 fi
 ```
 
-## 7. Apply Changes
+### Keep `~/.local/bin` on `PATH`
+
+Ensure this line exists below `source $ZSH/oh-my-zsh.sh`:
+
+```zsh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+### Hide the `agnoster` context segment
+
+The current setup suppresses the `user@host` context in the prompt:
+
+```zsh
+prompt_context(){}
+```
+
+### Initialize `fnm`
+
+Ensure this block exists near the end of `~/.zshrc`:
+
+```zsh
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
+```
+
+## 7. Keep `.bashrc` aligned during the transition
+
+The current bash fallback keeps `~/.local/bin` on `PATH` and initializes `fnm`.
+Make sure `~/.bashrc` contains these lines once:
 
 ```bash
-source ~/.zshrc
+export PATH="$HOME/.local/bin:$PATH"
+
+if [ -d "$HOME/.fnm" ]; then
+  export PATH="$HOME/.fnm:$PATH"
+elif [ -n "$XDG_DATA_HOME" ] && [ -d "$XDG_DATA_HOME/fnm" ]; then
+  export PATH="$XDG_DATA_HOME/fnm:$PATH"
+elif [ -d "$HOME/.local/share/fnm" ]; then
+  export PATH="$HOME/.local/share/fnm:$PATH"
+fi
+
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell bash)"
+fi
+```
+
+If you still have custom aliases or functions in `~/.bashrc`, copy only the ones you still want. The current Zsh setup relies mostly on Oh My Zsh plugins instead of carrying over the default bash aliases.
+
+## 8. Reload the shell
+
+```bash
+exec zsh
 ```
 
 ## Verification
 
 ```bash
 echo "Shell: $SHELL"
-echo "Zsh version: $(zsh --version)"
-echo "Oh My Zsh: $([ -d ~/.oh-my-zsh ] && echo 'installed' || echo 'missing')"
-echo "Autosuggestions: $([ -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions ] && echo 'installed' || echo 'missing')"
-echo "Syntax highlighting: $([ -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ] && echo 'installed' || echo 'missing')"
-echo "Autocomplete: $([ -d ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autocomplete ] && echo 'installed' || echo 'missing')"
-echo "NVM: $(command -v nvm &>/dev/null && echo 'loaded' || echo 'not loaded')"
+zsh --version
+grep '^ZSH_THEME=' ~/.zshrc
+grep -n '^plugins=' ~/.zshrc
+grep -n 'fnm env --use-on-cd --shell zsh' ~/.zshrc
+grep -n 'prompt_context(){}' ~/.zshrc
+command -v fnm && fnm --version
 ```
