@@ -16,12 +16,15 @@ The status bar shows a Copilot segment only when the **focused tmux pane** is ru
 When active, the segment format is:
 
 ```text
-CTX 78.0k/272k 28.7% | Quota 57.0%
+CTX 78k/305k ▃ 26% | Quota 57%
 ```
 
 Behavior details:
 
 - `CTX ...` comes from the focused pane's active Copilot session log
+- the display total adds a 32k headroom to the compaction budget so it tracks `/context` more closely
+- the context percentage includes an 8-step vertical meter: `▁▂▃▄▅▆▇█`
+- meter colors are thresholded: under 50% green, 50-70% orange, 70%+ red
 - `Quota ...` comes from `gh api /copilot_internal/user`
 - quota is only shown when a matching Copilot session is active in the focused pane
 - switching panes or windows updates the displayed Copilot context to follow the focused pane
@@ -60,7 +63,7 @@ The helper reads:
 gh api /copilot_internal/user
 ```
 
-It uses `quota_snapshots.premium_interactions` and renders only the used percentage as `Quota xx.x%`.
+It uses `quota_snapshots.premium_interactions` and renders only the used percentage as `Quota xx%`.
 
 The API response is cached for 5 minutes in:
 

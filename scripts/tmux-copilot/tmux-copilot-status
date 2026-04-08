@@ -11,12 +11,15 @@ from typing import Optional
 
 
 CACHE_TTL_SECONDS = 300
+CONTEXT_HEADROOM_TOKENS = 32768
 HOME = Path.home()
 COPILOT_DIR = HOME / ".copilot"
 SESSION_STATE_DIR = COPILOT_DIR / "session-state"
 LOGS_DIR = COPILOT_DIR / "logs"
 CACHE_DIR = HOME / ".cache" / "tmux-copilot-status"
 CACHE_FILE = CACHE_DIR / "quota.json"
+METER_GLYPHS = "▁▂▃▄▅▆▇█"
+SEGMENT_FG = "#e4e4e4"
 
 UTILIZATION_RE = re.compile(
     r"CompactionProcessor: Utilization (?P<pct>[0-9.]+)% "
@@ -26,16 +29,23 @@ UTILIZATION_RE = re.compile(
 
 def format_compact(value: int) -> str:
     if value >= 1_000_000:
-        whole, remainder = divmod(value, 1_000_000)
-        if remainder == 0:
-            return f"{whole}M"
-        return f"{value / 1_000_000:.1f}M"
+        return f"{round(value / 1_000_000)}M"
     if value >= 1_000:
-        whole, remainder = divmod(value, 1_000)
-        if remainder == 0:
-            return f"{whole}k"
-        return f"{value / 1_000:.1f}k"
+        return f"{round(value / 1_000)}k"
     return str(value)
+
+
+def render_meter(pct: float) -> str:
+    clamped_pct = max(0.0, min(pct, 100.0))
+    index = min(int((clamped_pct / 100.0) * len(METER_GLYPHS)), len(METER_GLYPHS) - 1)
+    glyph = METER_GLYPHS[index]
+    if clamped_pct < 50.0:
+        color = "colour46"
+    elif clamped_pct < 70.0:
+        color = "colour214"
+    else:
+        color = "colour196"
+    return f"#[fg={color}]{glyph}#[fg={SEGMENT_FG}]"
 
 
 def read_json(path: Path) -> Optional[dict]:
@@ -155,8 +165,10 @@ def get_context_segment(preferred_pane_pid: Optional[str] = None) -> Optional[st
     match = matches[-1]
     used = int(match.group("used"))
     total = int(match.group("total"))
-    pct = float(match.group("pct"))
-    return f"CTX {format_compact(used)}/{format_compact(total)} {pct:.1f}%"
+    display_total = total + CONTEXT_HEADROOM_TOKENS
+    pct = (used / display_total) * 100 if display_total else 0.0
+    meter = render_meter(pct)
+    return f"CTX {format_compact(used)}/{format_compact(display_total)} {meter} {pct:.0f}%"
 
 
 def fetch_quota_payload() -> Optional[dict]:
@@ -232,7 +244,7 @@ def get_quota_segment() -> Optional[str]:
 
     used = max(0, entitlement - remaining)
     pct = (used / entitlement) * 100
-    return f"Quota {pct:.1f}%"
+    return f"Quota {pct:.0f}%"
 
 
 def main() -> int:
