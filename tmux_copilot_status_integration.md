@@ -86,14 +86,16 @@ gh auth refresh -h github.com -s user
 The active override on this machine is:
 
 ```tmux
-tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_vbar, #{battery_vbar},}#{?battery_percentage, #{battery_percentage},} | #(/home/ondra/.local/bin/tmux-copilot-status '#{pane_pid}') | %R , %d %b | #{username}#{root} @ #{hostname} "
+tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_vbar, #{battery_vbar},}#{?battery_percentage, #{battery_percentage},} | #(/home/ondra/.local/bin/tmux-copilot-status '#{pane_pid}') | #(/home/ondra/.local/bin/tmux-claude-status '#{pane_pid}') | %R , %d %b | #{username}#{root} @ #{hostname} "
 
-tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_12,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_14"
-tmux_conf_theme_status_right_bg="$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_16,$tmux_conf_theme_colour_17"
-tmux_conf_theme_status_right_attr="none,none,none,bold"
+tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_12,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_14"
+tmux_conf_theme_status_right_bg="$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_15,$tmux_conf_theme_colour_16,$tmux_conf_theme_colour_17"
+tmux_conf_theme_status_right_attr="none,none,none,none,bold"
 ```
 
-Important detail: in Oh My Tmux, major right-side theme segments are split with `|`, not commas. That is why the Copilot block must be its own `| ... |` segment to keep the black background separate from the red time/date segment.
+Note: the Claude status segment was added alongside Copilot (see `tmux_claude_status_integration.md`). The fg/bg arrays now have 5 entries: battery, Copilot, Claude, time/date, username.
+
+Important detail: in Oh My Tmux, major right-side theme segments are split with `|`, not commas. That is why the Copilot and Claude blocks must each be their own `| ... |` segment to keep the black background separate from the red time/date segment.
 
 ## Install or restore from the tracked script copy
 
