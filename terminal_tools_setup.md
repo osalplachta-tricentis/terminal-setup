@@ -12,12 +12,14 @@ Every guide in this repository is meant to be **idempotent**: safe to follow on 
 4. If they choose tmux, continue with [Oh My Tmux installation](oh_my_tmux_installation.md)
 5. If they choose tmux, continue with [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
 6. If they choose tmux, continue with [WSL clipboard integration](wsl_clipboard_integration.md)
-7. [Midnight Commander installation](midnight_commander_installation.md)
-8. [lazygit installation](lazygit_installation.md)
-9. [Fresh editor installation](fresh_editor_installation.md)
-10. [fnm installation](fnm_installation.md)
-11. [git installation](git_installation.md)
-12. [Python installation](python_installation.md)
+7. If they choose tmux, continue with [tmux Copilot status integration](tmux_copilot_status_integration.md)
+8. If they choose tmux, continue with [tmux Claude Code status integration](tmux_claude_status_integration.md)
+9. [Midnight Commander installation](midnight_commander_installation.md)
+10. [lazygit installation](lazygit_installation.md)
+11. [Fresh editor installation](fresh_editor_installation.md)
+12. [fnm installation](fnm_installation.md)
+13. [git installation](git_installation.md)
+14. [Python installation](python_installation.md)
 
 ## Multiplexer choice
 
@@ -28,6 +30,8 @@ Before starting any terminal multiplexer setup, ask the user whether they prefer
   - [Oh My Tmux installation](oh_my_tmux_installation.md)
   - [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
   - [WSL clipboard integration](wsl_clipboard_integration.md)
+  - [tmux Copilot status integration](tmux_copilot_status_integration.md)
+  - [tmux Claude Code status integration](tmux_claude_status_integration.md)
 - If they choose **Zellij**, follow:
   - [Zellij installation](zellij_installation.md)
 
