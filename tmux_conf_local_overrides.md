@@ -61,6 +61,9 @@ grep -q "^set -g @plugin 'omerxx/tmux-floax'$" "$LOCAL_CONF" || \
 
 grep -q "^set -g visual-bell off$" "$LOCAL_CONF" || \
   printf "set -g visual-bell off\n" >> "$LOCAL_CONF"
+
+grep -q "^set -g set-titles off$" "$LOCAL_CONF" || \
+  printf "set -g set-titles off\n" >> "$LOCAL_CONF"
 ```
 
 ## What those settings do
@@ -71,6 +74,7 @@ grep -q "^set -g visual-bell off$" "$LOCAL_CONF" || \
 - let Oh My Tmux auto-install and update TPM plugins
 - enable the `omerxx/tmux-floax` popup/scratchpad plugin
 - disable visual bell noise
+- stop tmux from emitting title-update bell sequences when windows change
 
 ## Optional terminal color overrides
 
@@ -94,6 +98,6 @@ tmux source-file ~/.config/tmux/tmux.conf
 ## Verify
 
 ```bash
-grep -n "tmux_conf_update_plugins_on_launch\|tmux_conf_update_plugins_on_reload\|@plugin 'omerxx/tmux-floax'\|visual-bell off" ~/.config/tmux/tmux.conf.local
+grep -n "tmux_conf_update_plugins_on_launch\|tmux_conf_update_plugins_on_reload\|@plugin 'omerxx/tmux-floax'\|visual-bell off\|set-titles off" ~/.config/tmux/tmux.conf.local
 find ~/.config/tmux/plugins -maxdepth 1 -mindepth 1 -type d | sort
 ```
