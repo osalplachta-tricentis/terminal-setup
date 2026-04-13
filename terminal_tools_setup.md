@@ -8,14 +8,16 @@ Every guide in this repository is meant to be **idempotent**: safe to follow on 
 
 1. [Bash to Zsh migration](bash_to_zsh_migration.md)
 2. Ask the user which terminal multiplexer they prefer: [tmux](tmux_installation.md) or [Zellij](zellij_installation.md)
-3. If they choose tmux, continue with [Oh My Tmux installation](oh_my_tmux_installation.md)
-4. If they choose tmux, continue with [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
-5. [Midnight Commander installation](midnight_commander_installation.md)
-6. [lazygit installation](lazygit_installation.md)
-7. [Fresh editor installation](fresh_editor_installation.md)
-8. [fnm installation](fnm_installation.md)
-9. [git installation](git_installation.md)
-10. [Python installation](python_installation.md)
+3. If they choose tmux, continue with [tmux installation](tmux_installation.md)
+4. If they choose tmux, continue with [Oh My Tmux installation](oh_my_tmux_installation.md)
+5. If they choose tmux, continue with [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
+6. If they choose tmux, continue with [WSL clipboard integration](wsl_clipboard_integration.md)
+7. [Midnight Commander installation](midnight_commander_installation.md)
+8. [lazygit installation](lazygit_installation.md)
+9. [Fresh editor installation](fresh_editor_installation.md)
+10. [fnm installation](fnm_installation.md)
+11. [git installation](git_installation.md)
+12. [Python installation](python_installation.md)
 
 ## Multiplexer choice
 
@@ -25,6 +27,7 @@ Before starting any terminal multiplexer setup, ask the user whether they prefer
   - [tmux installation](tmux_installation.md)
   - [Oh My Tmux installation](oh_my_tmux_installation.md)
   - [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
+  - [WSL clipboard integration](wsl_clipboard_integration.md)
 - If they choose **Zellij**, follow:
   - [Zellij installation](zellij_installation.md)
 
