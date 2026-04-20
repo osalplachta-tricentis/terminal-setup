@@ -7,15 +7,28 @@ Every guide in this repository is meant to be **idempotent**: safe to follow on 
 ## Recommended order
 
 1. [Bash to Zsh migration](bash_to_zsh_migration.md)
-2. [tmux installation](tmux_installation.md)
-3. [Oh My Tmux installation](oh_my_tmux_installation.md)
-4. [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
+2. Ask the user which terminal multiplexer they prefer: [tmux](tmux_installation.md) or [Zellij](zellij_installation.md)
+3. If they choose tmux, continue with [Oh My Tmux installation](oh_my_tmux_installation.md)
+4. If they choose tmux, continue with [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
 5. [Midnight Commander installation](midnight_commander_installation.md)
 6. [lazygit installation](lazygit_installation.md)
 7. [Fresh editor installation](fresh_editor_installation.md)
 8. [fnm installation](fnm_installation.md)
 9. [git installation](git_installation.md)
 10. [Python installation](python_installation.md)
+
+## Multiplexer choice
+
+Before starting any terminal multiplexer setup, ask the user whether they prefer **tmux** or **Zellij**.
+
+- If they choose **tmux**, follow:
+  - [tmux installation](tmux_installation.md)
+  - [Oh My Tmux installation](oh_my_tmux_installation.md)
+  - [`.tmux.conf.local` overrides](tmux_conf_local_overrides.md)
+- If they choose **Zellij**, follow:
+  - [Zellij installation](zellij_installation.md)
+
+The tmux status integrations in this repository are tmux-specific and should only be applied when the user chose tmux.
 
 ## Shared assumptions
 
@@ -40,6 +53,7 @@ At the time this documentation was reviewed, the machine already had:
 
 - `zsh` + Oh My Zsh
 - `tmux`
+- `zellij`
 - `mc` (Midnight Commander)
 - `lazygit`
 - `fresh`
